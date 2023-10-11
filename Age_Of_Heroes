@@ -1,0 +1,94 @@
+local player = game.Players.LocalPlayer
+local workspace = game:GetService("Workspace")
+
+local orbFarmEnabled = false
+local button = nil
+
+local teleporting = false
+
+function collectOrbs()
+    while orbFarmEnabled do
+        pcall(function()
+            for i, v in pairs(workspace.ExperienceOrbs:GetChildren()) do
+                firetouchinterest(player.Character.HumanoidRootPart, v, 0)
+            end
+        end)
+        wait(1)
+    end
+end
+
+function toggleOrbFarm()
+    orbFarmEnabled = not orbFarmEnabled
+    if orbFarmEnabled then
+        spawn(collectOrbs)
+        button.Text = "Auto Coletar Orbs (Ligado)"
+        button.BackgroundColor3 = Color3.new(0, 0, 0)
+        button.TextColor3 = Color3.new(1, 1, 1)
+    else
+        button.Text = "Auto Coletar Orbs (Desligado)"
+        button.BackgroundColor3 = Color3.new(1, 0, 0)
+        button.TextColor3 = Color3.new(1, 1, 1)
+    end
+end
+
+function createMenu()
+    local menu = Instance.new("ScreenGui")
+    menu.Name = "OrbFarmMenu"
+    menu.Parent = player.PlayerGui
+    menu.IgnoreGuiInset = true
+
+    button = Instance.new("TextButton")
+    button.Name = "ToggleButton"
+    button.Text = "Auto Coletar Orbs (Desligado)"
+    button.Parent = menu
+    button.Size = UDim2.new(0, 200, 0, 50)
+    button.Position = UDim2.new(0.4, -100, 0, 10)
+    button.BackgroundColor3 = Color3.new(1, 0, 0)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Font = Enum.Font.SourceSansBold
+    button.TextSize = 18
+    button.MouseButton1Click:Connect(toggleOrbFarm)
+
+    local teleportButton = Instance.new("TextButton")
+    teleportButton.Name = "TeleportButton"
+    teleportButton.Text = "Teleportar para a Praça"
+    teleportButton.Parent = menu
+    teleportButton.Size = UDim2.new(0, 200, 0, 50)
+    teleportButton.Position = UDim2.new(0.4, -100, 0, 60)
+    teleportButton.BackgroundColor3 = Color3.new(0, 0.5, 1)
+    teleportButton.TextColor3 = Color3.new(1, 1, 1)
+    teleportButton.Font = Enum.Font.SourceSansBold
+    teleportButton.TextSize = 18
+
+    teleportButton.MouseButton1Click:Connect(function()
+        if not teleporting then
+            teleporting = true
+            teleportButton.BackgroundColor3 = Color3.new(0, 0, 0)
+            teleportButton.Text = "Teleportado!"
+
+            local newPosition = Vector3.new(-385, 145, 271)
+            player.Character:SetPrimaryPartCFrame(CFrame.new(newPosition))
+
+            wait(0.4)
+            teleporting = false
+            teleportButton.BackgroundColor3 = Color3.new(0, 0.5, 1)
+            teleportButton.Text = "Teleportar para a Praça"
+        end
+    end)
+
+    local creatorLabel = Instance.new("TextLabel")
+    creatorLabel.Name = "CreatorLabel"
+    creatorLabel.Text = "Criador: Mg_PlayerOficial - v3.5"
+    creatorLabel.Parent = menu
+    creatorLabel.Size = UDim2.new(0, 200, 0, 20)
+    creatorLabel.Position = UDim2.new(0.4, -100, 0, 50)
+    creatorLabel.BackgroundColor3 = Color3.new(1, 1, 1)
+    creatorLabel.TextColor3 = Color3.new(0, 0, 0)
+    creatorLabel.TextSize = 10
+end
+
+createMenu()
+
+player.CharacterAdded:Connect(function()
+    createMenu()
+end)
